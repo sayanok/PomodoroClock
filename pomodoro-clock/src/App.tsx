@@ -1,27 +1,27 @@
 import React, { useEffect, useRef, useState } from "react";
 
 const App: React.FC = () => {
-  const [timer, setTimer] = useState(3);
+  const [timer, setTimer] = useState(1500);
   const [session, setSession] = useState<"作業セッション" | "休憩セッション">("作業セッション");
-  // const [timeoutId, setTimeoutId] = useState<NodeJS.Timer>();
+  const [timerStatus, setTimerStatus] = useState<"開始" | "一時停止">("開始");
   let timeoutId = useRef<NodeJS.Timer>();
 
   useEffect(() => {
-    if (timer === 0) {
+    if (timer === -1) {
       clearInterval(timeoutId.current);
+      changeTimer();
     }
   }, [timer]);
 
   function onClickHandler() {
-    // timerStart();
-    countdown();
+    if (timerStatus === "開始") {
+      countdown();
+      setTimerStatus("一時停止");
+    } else {
+      clearInterval(timeoutId.current);
+      setTimerStatus("開始");
+    }
   }
-
-  // function timerStart() {
-  //   setTimeout(() => {
-  //     changeTimer();
-  //   }, timer);
-  // }
 
   function countdown() {
     timeoutId.current = setInterval(() => {
@@ -30,23 +30,23 @@ const App: React.FC = () => {
   }
 
   function changeTimer() {
-    console.log("changeTimer");
-    // セッションを変更する
-    // タイマーを切り替える
-  }
-
-  function pause() {
-    // タイマーを一時停止する
+    setTimer(session === "作業セッション" ? 300 : 1500);
+    setSession(session === "作業セッション" ? "休憩セッション" : "作業セッション");
+    countdown();
   }
 
   function reset() {
     setSession("作業セッション");
+    setTimer(1500);
+    setTimerStatus("開始");
   }
   return (
     <>
-      <p>タイマー：{timer}</p>
+      <p>
+        タイマー：{Math.floor(timer / 60)}:{timer % 60 < 9 ? "0" + (timer % 60) : timer % 60}
+      </p>
       <p>現在のセッション:{session}</p>
-      <button onClick={() => onClickHandler()}>開始｜停止</button>
+      <button onClick={() => onClickHandler()}>{timerStatus === "開始" ? "開始" : "一時停止"}</button>
       <button onClick={() => reset()}>リセット</button>
     </>
   );
