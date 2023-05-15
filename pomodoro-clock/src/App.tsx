@@ -1,18 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
-import sound from "../public/alert.mp3";
+import sound from "./alert.mp3";
 
 const App: React.FC = () => {
-  const [timer, setTimer] = useState(10);
+  const [timer, setTimer] = useState(1500);
   const [session, setSession] = useState<"作業セッション" | "休憩セッション">("作業セッション");
   const [timerStatus, setTimerStatus] = useState<"開始" | "一時停止">("開始");
   let timeoutId = useRef<NodeJS.Timer>();
   const alert = new Audio(sound);
 
   useEffect(() => {
-    if (timer === -1) {
+    if (timer === 0) {
+      alert.play();
+    } else if (timer === -1) {
       clearInterval(timeoutId.current);
       changeTimer();
-      alert.play();
     }
   }, [timer]);
 
@@ -29,7 +30,7 @@ const App: React.FC = () => {
   function countdown() {
     timeoutId.current = setInterval(() => {
       setTimer((timer) => timer - 1);
-    }, 500);
+    }, 1000);
   }
 
   function changeTimer() {
@@ -39,6 +40,7 @@ const App: React.FC = () => {
   }
 
   function reset() {
+    clearInterval(timeoutId.current);
     setSession("作業セッション");
     setTimer(1500);
     setTimerStatus("開始");
